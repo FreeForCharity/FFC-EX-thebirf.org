@@ -228,7 +228,7 @@ export const siteConfig: SiteConfig = {
     },
   ],
   ein: '83-3288214',
-  phone: { display: '(513) 403-4185', tel: '15134034185' },
+  phone: { display: '(513) 403-4185', tel: '5134034185' },
   addresses: [
     {
       label: 'Main Address',
