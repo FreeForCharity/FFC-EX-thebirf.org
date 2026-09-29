@@ -1,10 +1,11 @@
-import { team } from '../../src/data/team'
+import { team, type TeamMember } from '../../src/data/team'
 import { isPending } from '../../src/lib/site.config'
 
 // A fork whose team the charity has not supplied yet lists 'team' in
 // siteConfig.pending and ships an EMPTY roster (never the template's FFC
 // staff); the per-member checks then have nothing to check.
-const itEachMember = team.length > 0 ? it.each(team) : it.skip.each([{ name: '', role: '' }])
+const placeholderRow: TeamMember = { name: '', role: '' }
+const itEachMember = team.length > 0 ? it.each(team) : it.skip.each([placeholderRow])
 
 describe('Team data integrity', () => {
   // The roster is per-charity content, so its SIZE and its NAMES are not
