@@ -2,7 +2,9 @@ import React from 'react'
 import { PENDING_TEXT, isPending, siteConfig } from '../../src/lib/site.config'
 import { render, screen } from '@testing-library/react'
 
-import TheFreeForCharityTeam from '../../src/components/home-page/TheFreeForCharityTeam'
+import TheFreeForCharityTeam, {
+  teamHeading,
+} from '../../src/components/home-page/TheFreeForCharityTeam'
 import { team } from '../../src/data/team'
 
 describe('TheFreeForCharityTeam component', () => {
@@ -12,7 +14,7 @@ describe('TheFreeForCharityTeam component', () => {
 
   it('should display the team heading', () => {
     render(<TheFreeForCharityTeam />)
-    expect(screen.getByText(`The ${siteConfig.name} Team`)).toBeInTheDocument()
+    expect(screen.getByText(teamHeading(siteConfig.name))).toBeInTheDocument()
   })
 
   it('should render a card per member with initials monograms and no photos', () => {
@@ -70,7 +72,7 @@ describe('TheFreeForCharityTeam with an empty roster', () => {
       const { container } = render(<PendingTeam />)
 
       expect(container.querySelector('#team')).toBeInTheDocument()
-      expect(screen.getByText(`The ${config.siteConfig.name} Team`)).toBeInTheDocument()
+      expect(screen.getByText(teamHeading(config.siteConfig.name))).toBeInTheDocument()
       expect(screen.getByText(config.PENDING_TEXT).closest('a')).toBeNull()
       expect(screen.queryAllByRole('heading', { level: 3 })).toHaveLength(0)
     })
@@ -81,5 +83,28 @@ describe('TheFreeForCharityTeam in the shipped config', () => {
   it('shows the placeholder exactly when the team is pending and empty', () => {
     render(<TheFreeForCharityTeam />)
     expect(Boolean(screen.queryByText(PENDING_TEXT))).toBe(isPending('team') && team.length === 0)
+  })
+})
+
+// The heading prefixes "The", so a name that already starts with the article
+// must not render "The The ... Team".
+describe('teamHeading', () => {
+  it('prefixes the article to a name without one', () => {
+    expect(teamHeading('Example Pantry')).toBe('The Example Pantry Team')
+    // Only the whole word counts as the article.
+    expect(teamHeading('Theatre Guild')).toBe('The Theatre Guild Team')
+  })
+
+  it('does not double an article the name already has, in any case', () => {
+    expect(teamHeading('The Brain Injury Research Foundation (TheBIRF)')).toBe(
+      'The Brain Injury Research Foundation (TheBIRF) Team'
+    )
+    expect(teamHeading('the example society')).toBe('the example society Team')
+    expect(teamHeading('  THE Example Society ')).toBe('THE Example Society Team')
+  })
+
+  it("renders this site's heading without a doubled article", () => {
+    render(<TheFreeForCharityTeam />)
+    expect(screen.queryByText(/The The/)).not.toBeInTheDocument()
   })
 })
